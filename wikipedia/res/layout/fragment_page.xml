@@ -56,37 +56,51 @@
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:contentDescription="@null"/>
-                    <FrameLayout
-                        android:id="@+id/page_title_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_gravity="bottom">
-                        <TextView
-                            android:id="@+id/page_title_text"
-                            android:layout_width="match_parent"
+                        <FrameLayout
+                            android:id="@+id/page_title_container"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textIsSelectable="true"
-                            android:fontFamily="serif"
-                            android:textDirection="anyRtl"
-                            android:paddingTop="16dp"
-                            android:paddingBottom="16dp"
-                            android:paddingRight="@dimen/activity_horizontal_margin"
-                            android:paddingLeft="@dimen/activity_horizontal_margin"/>
-                        <TextView
-                            android:id="@+id/page_description_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="bottom"
-                            android:visibility="invisible"
-                            android:textIsSelectable="true"
-                            android:fontFamily="serif"
-                            android:textDirection="anyRtl"
-                            android:textSize="@dimen/descriptionTextSize"
-                            android:paddingBottom="16dp"
-                            android:paddingRight="@dimen/activity_horizontal_margin"
-                            android:paddingLeft="@dimen/activity_horizontal_margin"/>
-                    </FrameLayout>
+                            android:orientation="vertical"
+                            android:layout_gravity="bottom">
+                            <TextView
+                                android:id="@+id/page_title_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textIsSelectable="true"
+                                android:fontFamily="serif"
+                                android:textDirection="anyRtl"
+                                android:paddingTop="16dp"
+                                android:paddingBottom="16dp"
+                                android:paddingRight="@dimen/activity_horizontal_margin"
+                                android:paddingLeft="@dimen/activity_horizontal_margin"/>
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom">
+                                <TextView
+                                    android:id="@+id/page_description_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="bottom"
+                                    android:visibility="invisible"
+                                    android:textIsSelectable="true"
+                                    android:fontFamily="serif"
+                                    android:textDirection="anyRtl"
+                                    android:textSize="@dimen/descriptionTextSize"
+                                    android:paddingBottom="16dp"
+                                    android:paddingRight="@dimen/activity_horizontal_margin"
+                                    android:paddingLeft="@dimen/activity_horizontal_margin"/>
+                                <TextView
+                                    android:id="@+id/page_description_edit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_toRightOf="@id/page_description_text"
+                                    android:paddingTop="4dp"
+                                    android:text="@string/page_description_edit"
+                                    android:textSize="@dimen/descriptionTextSize"
+                                    android:visibility="invisible"/>
+                            </RelativeLayout>
+                        </FrameLayout>
                 </FrameLayout>
             </LinearLayout>
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -25,6 +26,7 @@ import com.squareup.picasso.Target;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 import org.wikipedia.page.PageTitle;
 import org.wikipedia.R;
 import org.wikipedia.Utils;
@@ -34,6 +36,8 @@ import org.wikipedia.bridge.CommunicationBridge;
 import org.wikipedia.page.PageViewFragmentInternal;
 import org.wikipedia.util.ApiUtil;
 import org.wikipedia.views.ObservableWebView;
+
+import java.lang.reflect.Type;
 
 public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListener, ImageViewWithFace.OnImageLoadListener {
     private final Context context;
@@ -98,6 +102,9 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
     private View pageTitleContainer;
     private TextView pageTitleText;
     private TextView pageDescriptionText;
+    private TextView pageDescriptionEdit;
+
+    private Typeface wikiGlyph;
 
     private int displayHeight;
     private int imageBaseYOffset = 0;
@@ -116,27 +123,18 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
         this.imageContainer = hidingView;
         this.bridge = bridge;
         this.webView = webview;
-        displayDensity = context.getResources().getDisplayMetrics().density;
 
         imagePlaceholder = (ImageView)imageContainer.findViewById(R.id.page_image_placeholder);
         image1 = (ImageViewWithFace)imageContainer.findViewById(R.id.page_image_1);
         pageTitleContainer = imageContainer.findViewById(R.id.page_title_container);
         pageTitleText = (TextView)imageContainer.findViewById(R.id.page_title_text);
         pageDescriptionText = (TextView)imageContainer.findViewById(R.id.page_description_text);
+
+        initPageDescriptionEditButton();
+
         webview.addOnScrollChangeListener(this);
 
-        // preload the display density, since it will be used in a lot of places
-        displayDensity = context.getResources().getDisplayMetrics().density;
-
-        // get the screen height, using correct methods for different API versions
-        if (ApiUtil.hasHoneyCombMr2()) {
-            Point size = new Point();
-            parentFragment.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            displayHeight = (int)(size.y / displayDensity);
-        } else {
-            displayHeight = (int)(parentFragment.getActivity()
-                    .getWindowManager().getDefaultDisplay().getHeight() / displayDensity);
-        }
+        setDisplayHeight();
 
         webview.addOnClickListener(new ObservableWebView.OnClickListener() {
             @Override
@@ -164,6 +162,28 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
         imagePlaceholder.setImageResource(Utils.getThemedAttributeId(parentFragment.getActivity(),
                 R.attr.lead_image_drawable));
         image1.setOnImageLoadListener(this);
+    }
+
+    private void initPageDescriptionEditButton() {
+        wikiGlyph = Typeface.createFromAsset(context.getAssets(), "fonts/wikiglyph.ttf");
+
+        pageDescriptionEdit = (TextView)imageContainer.findViewById(R.id.page_description_edit);
+        pageDescriptionEdit.setTypeface(wikiGlyph);
+    }
+
+    private void setDisplayHeight() {
+        // preload the display density, since it will be used in a lot of places
+        displayDensity = context.getResources().getDisplayMetrics().density;
+
+        // get the screen height, using correct methods for different API versions
+        if (ApiUtil.hasHoneyCombMr2()) {
+            Point size = new Point();
+            parentFragment.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            displayHeight = (int)(size.y / displayDensity);
+        } else {
+            displayHeight = (int)(parentFragment.getActivity()
+                    .getWindowManager().getDefaultDisplay().getHeight() / displayDensity);
+        }
     }
 
     @Override
@@ -465,6 +485,11 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
             pageDescriptionText.setTextColor(context.getResources()
                     .getColor(Utils.getThemedAttributeId(parentFragment.getActivity(),
                                                          R.attr.lead_disabled_text_color)));
+
+            pageDescriptionEdit.setTextColor(context.getResources()
+                    .getColor(Utils.getThemedAttributeId(parentFragment.getActivity(),
+                            R.attr.lead_disabled_text_color)));
+
             pageDescriptionText.setShadowLayer(0, 0, 0, 0);
             // remove any background from the title container
             pageTitleContainer.setBackgroundColor(Color.TRANSPARENT);
@@ -488,14 +513,19 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
             titleBottomPadding = (int)(bottomPaddingNominal * displayDensity);
             // give default padding to the description
             pageDescriptionText.setPadding(pageDescriptionText.getPaddingLeft(),
-                                           pageDescriptionText.getPaddingTop(),
-                                           pageDescriptionText.getPaddingRight(),
-                                           titleBottomPadding);
+                    pageDescriptionText.getPaddingTop(),
+                    pageDescriptionText.getPaddingRight(),
+                    titleBottomPadding);
             // and give it a nice drop shadow!
             pageTitleText.setShadowLayer(2, 1, 1, context.getResources().getColor(R.color.lead_text_shadow));
+
             // do the same for the description...
             pageDescriptionText.setTextColor(context.getResources().getColor(R.color.lead_text_color));
             pageDescriptionText.setShadowLayer(2, 1, 1, context.getResources().getColor(R.color.lead_text_shadow));
+
+            pageDescriptionEdit.setTextColor(context.getResources().getColor(R.color.lead_text_color));
+            pageDescriptionEdit.setShadowLayer(2, 1, 1, context.getResources().getColor(R.color.lead_text_shadow));
+
             // set the title container background to be a gradient
             pageTitleContainer.setBackgroundResource(R.drawable.lead_title_gradient);
             // set the correct padding on the container
@@ -608,6 +638,7 @@ public class LeadImagesHandler implements ObservableWebView.OnScrollChangeListen
                                     pageTitleText.getPaddingRight(),
                                     origPadding + (int)(newMargin * interpolatedTime));
                         }
+                        pageDescriptionEdit.setVisibility(View.VISIBLE);
                     }
                 };
                 anim.setDuration(animDuration);
